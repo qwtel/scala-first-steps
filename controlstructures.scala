@@ -34,3 +34,23 @@ g.substring(7, 9) // works
 
 // Therefore: using currying so the last argument is in its own argument list
 // The first argument in parenthesis, the second in curly braces
+
+var assertionEnabled = true
+
+def myAssert(predicate: () => Boolean) =
+  if (assertionEnabled && !predicate)
+    throw new AssertionError
+
+// a bit awkward
+myAssert(() => 5 > 3)
+
+// not working
+// myAssert(5 > 3)
+
+// by-name parameter to the rescue
+// leaving out the `()`
+def byNameAssert(predicate: => Boolean) =
+  if (assertionEnabled && !predicate)
+    throw new AssertionError
+
+byNameAssert(5 > 3) == true
