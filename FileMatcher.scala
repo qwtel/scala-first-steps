@@ -11,20 +11,22 @@ object FileMatcher {
   private def filesHere = (new File(".")).listFiles
 
   def filesEnding(query: String) =
-    for {
-      file <- filesHere
-      if file.getName.endsWith(query)
-    } yield file
+    filesMatching(query,
+      (fileName: String, query: String) => fileName.endsWith(query)
+    )
 
   def filesContaining(query: String) =
-    for {
-      file <- filesHere
-      if file.getName.contains(query)
-    } yield file
+    filesMatching(query,
+      (fileName, query) => fileName.contains(query)
+    )
 
   def filesRegex(query: String) =
+    filesMatching(query, _.matches(_))
+
+  def filesMatching(query: String, matcher: (String, String) => Boolean) = {
     for {
       file <- filesHere
-      if file.getName.matches(query)
+      if matcher(file.getName, query)
     } yield file
+  }
 }
