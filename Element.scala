@@ -1,12 +1,14 @@
+import Element.elem
+
 abstract class Element {
   def contents: Array[String]
   def height = contents.length
   def width = if (height == 0) 0 else contents(0).length
 
-  def above(that: Element) = new ArrayElement(this.contents ++ that.contents)
+  def above(that: Element) = elem(this.contents ++ that.contents)
 
   def beside(that: Element) = {
-    new ArrayElement(
+    elem(
       for {
         (line1, line2) <- this.contents zip that.contents
       } yield line1 + line2
@@ -30,5 +32,16 @@ class UniformElement(
   override val height: Int
 ) extends Element {
   private val line = ch.toString * width
-  def contents = (for (i <- 1 to height) yield line).toArray
+  def contents = (for (_ <- 1 to height) yield line).toArray
+}
+
+object Element {
+  def elem(contents: Array[String]): Element =
+    new ArrayElement(contents)
+
+  def elem(chr: Char, width: Int, height: Int): Element =
+    new UniformElement(chr, width, height)
+
+  def elem(line: String): Element =
+    new LineElement(line)
 }
