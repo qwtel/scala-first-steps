@@ -5,15 +5,37 @@ abstract class Element {
   def height = contents.length
   def width = if (height == 0) 0 else contents(0).length
 
-  def above(that: Element) = elem(this.contents ++ that.contents)
+  def above(that: Element) = {
+    val thisSyncedWidth = this widen that.width
+    val thatSyncedWidth = that widen this.width
+    elem(thisSyncedWidth.contents ++ thatSyncedWidth.contents)
+  }
 
   def beside(that: Element) = {
+    val thisSyncedHeight = this heighten that.height
+    val thatSyncedHeight = that heighten this.height
     elem(
       for {
-        (line1, line2) <- this.contents zip that.contents
+        (line1, line2) <- thisSyncedHeight.contents zip thatSyncedHeight.contents
       } yield line1 + line2
     )
   }
+
+  private def widen(w: Int): Element =
+    if (w <= width) this
+    else {
+      val left = elem(' ', (w - width) / 2, height)
+      val right = elem(' ', w - width - left.width, height)
+      left beside this beside right
+    }
+
+  private def heighten(h: Int): Element =
+    if (h <= height) this
+    else {
+      val top = elem(' ', width, (h - height)/2)
+      val bottom = elem(' ', width, h - height - top.height)
+      top above this above bottom
+    }
 
   final override def toString = contents.mkString("\n")
 }
