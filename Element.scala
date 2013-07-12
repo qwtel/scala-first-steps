@@ -18,24 +18,24 @@ abstract class Element {
   final override def toString = contents.mkString("\n")
 }
 
-class ArrayElement(val contents: Array[String]) extends Element
-
-class LineElement(s: String) extends Element {
-  val contents = Array(s)
-  override val width = s.length
-  override val height = 1
-}
-
-class UniformElement(
-  ch: Char,
-  override val width: Int,
-  override val height: Int
-) extends Element {
-  private val line = ch.toString * width
-  def contents = (for (_ <- 1 to height) yield line).toArray
-}
-
 object Element {
+  private class ArrayElement(val contents: Array[String]) extends Element
+
+  private class LineElement(s: String) extends Element {
+    val contents = Array(s)
+    override val width = s.length
+    override val height = 1
+  }
+
+  private class UniformElement(
+    ch: Char,
+    override val width: Int,
+    override val height: Int
+  ) extends Element {
+    private val line = ch.toString * width
+    def contents = (for (_ <- 1 to height) yield line).toArray
+  }
+
   def elem(contents: Array[String]): Element =
     new ArrayElement(contents)
 
