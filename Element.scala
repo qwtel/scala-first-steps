@@ -3,3 +3,7 @@ abstract class Element {
   def height = contents.length
   def width = if (height == 0) 0 else contents(0).length
 }
+
+class ArrayElement(conts: Array[String]) extends Element {
+  def contents = conts
+}
