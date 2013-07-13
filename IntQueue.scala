@@ -10,3 +10,9 @@ class BasicIntQueue extends IntQueue {
   def get() = buf remove 0
   def put(x: Int) = buf += x
 }
+
+trait Doubling extends IntQueue {
+  abstract override def put(x: Int) = super.put(2 * x)
+}
+
+class MyQueue extends BasicIntQueue with Doubling
