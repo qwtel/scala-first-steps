@@ -8,12 +8,18 @@ abstract class Element {
   def above(that: Element) = {
     val thisSyncedWidth = this widen that.width
     val thatSyncedWidth = that widen this.width
+
+    assert(thisSyncedWidth.width == thatSyncedWidth.width) // Method 1
+
     elem(thisSyncedWidth.contents ++ thatSyncedWidth.contents)
   }
 
   def beside(that: Element) = {
     val thisSyncedHeight = this heighten that.height
     val thatSyncedHeight = that heighten this.height
+
+    assert(thisSyncedHeight.height == thatSyncedHeight.height)
+
     elem(
       for {
         (line1, line2) <- thisSyncedHeight.contents zip thatSyncedHeight.contents
@@ -27,7 +33,7 @@ abstract class Element {
       val left = elem(' ', (w - width) / 2, height)
       val right = elem(' ', w - width - left.width, height)
       left beside this beside right
-    }
+    } ensuring (w <= _.width) // Method 2
 
   private def heighten(h: Int): Element =
     if (h <= height) this
@@ -35,7 +41,7 @@ abstract class Element {
       val top = elem(' ', width, (h - height)/2)
       val bottom = elem(' ', width, h - height - top.height)
       top above this above bottom
-    }
+    } ensuring (h <= _.height)
 
   final override def toString = contents.mkString("\n")
 }
