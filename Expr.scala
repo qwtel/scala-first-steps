@@ -61,4 +61,13 @@ object Expr {
     case Some(s) => s
     case None => "?"
   }
+
+  val expr = new BinOp("*", Number(5), Number(1))
+  val BinOp(op, left, right) = expr // implicit pattern match
+
+  // like functions, but more general
+  def withDefault: Option[Int] => Int = {
+    case Some(x) => x
+    case None => 0
+  }
 }
