@@ -27,4 +27,9 @@ object Expr {
     case a: Array[String] => "yes"
     case _ => "no"
   }
+
+  def simplifyDoubleAbs(expr: Expr): Expr = expr match {
+    case UnOp("abs", e @ UnOp("abs", _)) => e // UnOp bound to e
+    case _ => expr
+  }
 }
