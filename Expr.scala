@@ -34,7 +34,8 @@ object Expr {
   }
 
   def simplifyAdd(e: Expr) = e match {
-    case BinOp("+", x, x) => BinOp("*", x, Number(2)) // error: double binding to x
+    case BinOp("+", x, y) if x == y =>
+      BinOp("*", x, Number(2)) // error: double binding to x
     case _ => e
   }
 }
