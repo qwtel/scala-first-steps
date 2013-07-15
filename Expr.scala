@@ -52,4 +52,13 @@ object Expr {
     case Number(_) => "a number"
     case Var(_) => "a variable"
   }
+
+  val capitals = Map("France" -> "Paris", "Japan" -> "Tokyo")
+  // capitals get "France" // Some(Paris)
+  // capitals get "North Pole" // None
+
+  def show(x: Option[String]) = x match {
+    case Some(s) => s
+    case None => "?"
+  }
 }
