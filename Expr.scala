@@ -47,4 +47,9 @@ object Expr {
     case BinOp(op, l, r) => BinOp(op, simplifyAll(l), simplifyAll(r))
     case _ => expr
   }
+
+  def describe(e: Expr): String = e match { // warning: match not exhaustive
+    case Number(_) => "a number"
+    case Var(_) => "a variable"
+  }
 }
