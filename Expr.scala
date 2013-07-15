@@ -48,7 +48,7 @@ object Expr {
     case _ => expr
   }
 
-  def describe(e: Expr): String = e match { // warning: match not exhaustive
+  def describe(e: Expr): String = (e: @unchecked) match {
     case Number(_) => "a number"
     case Var(_) => "a variable"
   }
