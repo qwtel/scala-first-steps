@@ -38,4 +38,13 @@ object Expr {
       BinOp("*", x, Number(2)) // error: double binding to x
     case _ => e
   }
+
+  def simplifyAll(expr: Expr): Expr = expr match {
+    case UnOp("-", UnOp("-", e)) => simplifyAll(e)
+    case BinOp("+", e, Number(0)) => simplifyAll(e)
+    case BinOp("*", e, Number(1)) => simplifyAll(e)
+    case UnOp(op, e) => UnOp(op, simplifyAll(e))
+    case BinOp(op, l, r) => BinOp(op, simplifyAll(l), simplifyAll(r))
+    case _ => expr
+  }
 }
