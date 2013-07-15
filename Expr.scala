@@ -11,4 +11,20 @@ object Expr {
     case BinOp("*", e, Number(1)) => e
     case _ => expr
   }
+
+  def generalSize(x: Any) = x match {
+    case s: String => s.length
+    case m: Map[_, _] => m.size
+    case _ => -1
+  }
+
+  def isIntIntMap(x: Any) = x match {
+    case m: Map[Int, Int] => true // type gets erased, not possible
+    case _ => false
+  }
+
+  def isStringArray(x: Any) = x match {
+    case a: Array[String] => "yes"
+    case _ => "no"
+  }
 }
