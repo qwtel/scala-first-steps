@@ -32,4 +32,9 @@ object Expr {
     case UnOp("abs", e @ UnOp("abs", _)) => e // UnOp bound to e
     case _ => expr
   }
+
+  def simplifyAdd(e: Expr) = e match {
+    case BinOp("+", x, x) => BinOp("*", x, Number(2)) // error: double binding to x
+    case _ => e
+  }
 }
