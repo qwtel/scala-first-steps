@@ -1,9 +1,15 @@
 object Sort {
   def isort(xs: List[Int]): List[Int] =
-    if (xs.isEmpty) Nil
-    else insert(xs.head, isort(xs.tail))
+    xs match {
+      case Nil => Nil
+      case x :: xs1 => insert(x, isort(xs1))
+  }
 
   def insert(x: Int, xs: List[Int]): List[Int] =
-    if (xs.isEmpty || x <= xs.head) x :: xs
-    else xs.head :: insert(x, xs.tail)
+    xs match {
+      case Nil => List(x)
+      case y :: _ =>
+        if (x <= y) x :: xs
+        else y :: insert(x, xs.tail)
+  }
 }
