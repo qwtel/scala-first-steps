@@ -13,3 +13,11 @@ object Sort {
         else y :: insert(x, xs.tail)
   }
 }
+
+object ListMethods {
+  def append[T](xs: List[T], ys: List[T]): List[T] =
+    xs match {
+      case Nil => ys
+      case x :: _ => x :: append(xs.tail, ys)
+    }
+}
