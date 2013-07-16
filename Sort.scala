@@ -20,4 +20,13 @@ object ListMethods {
       case Nil => ys
       case x :: _ => x :: append(xs.tail, ys)
     }
+
+  def length[T](xs: List[T]): Int = {
+    def helper(length: Int, xs: List[T]): Int =
+      xs match {
+        case Nil => 0
+        case x :: _ => helper(length + 1, xs.tail)
+      }
+    helper(0, xs)
+  }
 }
