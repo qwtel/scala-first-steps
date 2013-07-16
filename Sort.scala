@@ -24,9 +24,15 @@ object ListMethods {
   def length[T](xs: List[T]): Int = {
     def helper(length: Int, xs: List[T]): Int =
       xs match {
-        case Nil => 0
+        case Nil => length
         case x :: _ => helper(length + 1, xs.tail)
       }
     helper(0, xs)
   }
+
+  def reverse[T](xs: List[T]): List[T] =
+    xs match {
+      case Nil => Nil
+      case x :: _ => reverse(xs.tail) ::: List(x)
+    }
 }
