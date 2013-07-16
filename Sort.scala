@@ -12,6 +12,33 @@ object Sort {
         if (x <= y) x :: xs
         else y :: insert(x, xs.tail)
   }
+
+  /**
+   * Sorts a list by the merge sort algorithm
+   *
+   * @param less comparison function
+   * @param list the list to be sorted
+   * @tparam T the type of the list elements
+   * @return the sorted list according to less
+   */
+  def msort[T](less: (T, T) => Boolean)(list: List[T]): List[T] = {
+
+    def merge(xs: List[T], ys: List[T]): List[T] =
+      (xs, ys) match {
+        case (Nil, _) => ys
+        case (_, Nil) => xs
+        case (x :: _, y :: _) =>
+          if (less(x, y)) x :: merge(xs.tail, ys)
+          else y :: merge(xs, ys.tail)
+      }
+
+    val n = list.length / 2
+    if (n == 0) list
+    else {
+      val (left, right) = list splitAt n
+      merge(msort(less)(left), msort(less)(right))
+    }
+  }
 }
 
 object ListMethods {
