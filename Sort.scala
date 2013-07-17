@@ -39,6 +39,15 @@ object Sort {
       merge(msort(less)(left), msort(less)(right))
     }
   }
+
+  def msortSwapped[T](xs: List[T])(less: (T, T) => Boolean): List[T] =
+    msort(less)(xs)
+
+  /*
+  val abcde = List('a', 'b', 'c', 'd', 'e')
+  msort((x: Char, y: Char) => x > y)(abcde)
+  msortSwapped(abcde)(_ > _)
+  */
 }
 
 object ListMethods {
