@@ -57,9 +57,14 @@ object ListMethods {
     helper(0, xs)
   }
 
+  // O(n^2)
   def reverse[T](xs: List[T]): List[T] =
     xs match {
       case Nil => Nil
       case x :: _ => reverse(xs.tail) ::: List(x)
     }
+
+  // O(n)
+  // def reverseLeft[T](xs: List[T]): List[T] = (List[T]() /: xs)((ys, y) => y :: ys)
+  def reverseLeft[T](xs: List[T]): List[T] = xs.foldLeft(List[T]())((ys, y) => y :: ys)
 }
