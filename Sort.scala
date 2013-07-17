@@ -67,4 +67,10 @@ object ListMethods {
   // O(n)
   // def reverseLeft[T](xs: List[T]): List[T] = (List[T]() /: xs)((ys, y) => y :: ys)
   def reverseLeft[T](xs: List[T]): List[T] = xs.foldLeft(List[T]())((ys, y) => y :: ys)
+
+  // Slow
+  def flattenLeft[T](xss: List[List[T]]) = xss.foldLeft(List[T]())(_ ::: _)
+
+  // Faster
+  def flattenRight[T](xss: List[List[T]]) = xss.foldRight(List[T]())(_ ::: _)
 }
