@@ -10,10 +10,14 @@ class SlowHeadQueue[T](smele: List[T]) {
   def append(x: T) = new SlowHeadQueue(x :: smele)
 }
 
-class Queue[T](
+class Queue[T] private (
   private val leading: List[T],
   private val trailing: List[T]
 ) {
+  def this() = this(Nil, Nil)
+
+  def this(elems: T*) = this(elems.toList, Nil)
+
   private def mirror =
     if (leading.isEmpty)
       new Queue(trailing.reverse, Nil)
