@@ -34,3 +34,7 @@ class Queue[T] private (
   def append(x: T) =
     new Queue(leading, x :: trailing)
 }
+
+object Queue {
+  def apply[T](xs: T*) = new Queue[T](xs.toList, Nil)
+}
