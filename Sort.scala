@@ -48,6 +48,9 @@ object Sort {
   msort((x: Char, y: Char) => x > y)(abcde)
   msortSwapped(abcde)(_ > _)
   */
+
+  def msortOrdered[T <: Ordered[T]](xs: List[T]): List[T] =
+    msortSwapped(xs)(_ < _)
 }
 
 object ListMethods {
