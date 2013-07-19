@@ -3,15 +3,19 @@ abstract class Animal {
 }
 
 class Bunny extends Animal {
-  override def encounter(a: Animal) = "Generic Bunny encounter"
-  def encounter(b: Bunny) = "Mate"
-  def encounter(l: Lion) = "Run away"
+  override def encounter(a: Animal) = a match {
+    case _: Bunny => "Mate"
+    case _: Lion => "Run away"
+    case _ => "Generic Bunny encounter"
+  }
 }
 
 class Lion extends Animal {
-  override def encounter(a: Animal) = "Generic Lion encounter"
-  def encounter(b: Bunny) = "Eat"
-  def encounter(l: Lion) = "Fight"
+  override def encounter(a: Animal) = a match {
+    case _: Bunny => "Eat"
+    case _: Lion => "Fight"
+    case _ => "Generic Lion encounter"
+  }
 }
 
 object Animal extends App {
@@ -28,8 +32,8 @@ object Animal extends App {
   lion encounter lion // Fight
   lion encounter bunny // Eat
 
-  printEncounter(bunny, lion) // Generic Bunny encounter
-  printEncounter(bunny, bunny) // Generic Bunny encounter
-  printEncounter(lion, lion) // Generic Lion encounter
-  printEncounter(lion, bunny) // Generic Lion encounter
+  printEncounter(bunny, lion) // Run away
+  printEncounter(bunny, bunny) // Mate
+  printEncounter(lion, lion) // Fight
+  printEncounter(lion, bunny) // Eat
 }
