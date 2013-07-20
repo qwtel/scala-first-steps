@@ -1,4 +1,5 @@
-abstract class Currency {
+abstract class AbstractCurrency {
+  type Currency <: AbstractCurrency
   val amount: Long
   def designation: String
   override def toString = amount + " " + designation
@@ -6,6 +7,7 @@ abstract class Currency {
   def *(that: Currency): Currency = ???
 }
 
-abstract class Dollar extends Currency {
-  override def designation = "USD"
+abstract class Dollar extends AbstractCurrency {
+  type Currency = Dollar
+  def designation = "USD"
 }
