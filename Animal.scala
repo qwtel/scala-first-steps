@@ -1,5 +1,16 @@
+class Food
+class Grass extends Food
+
 abstract class Animal {
+  type SuitableFood <: Food
+  def eat(food: SuitableFood) = "Eating food"
+
   def encounter(a: Animal) = "Generic animal encounter"
+}
+
+class Cow extends Animal {
+  type SuitableFood = Grass
+  override def eat(food: Grass) = "Eating grass"
 }
 
 class Bunny extends Animal {
