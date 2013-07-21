@@ -1,13 +1,19 @@
-abstract class AbstractCurrency {
+abstract class CurrencyZone {
   type Currency <: AbstractCurrency
-  val amount: Long
-  def designation: String
-  override def toString = amount + " " + designation
-  def +(that: Currency): Currency = ???
-  def *(that: Currency): Currency = ???
+  def make(amount: Long): Currency // factory method
+  abstract class AbstractCurrency {
+    val amount: Long
+    def designation: String
+    override def toString = amount + " " + designation
+    def +(that: Currency): Currency = make(this.amount + that.amount)
+    def *(x: Double): Currency = make((this.amount * x).toLong)
+  }
 }
 
-abstract class Dollar extends AbstractCurrency {
+object US extends CurrencyZone {
+  abstract class Dollar extends AbstractCurrency {
+    def designation = "USD"
+  }
   type Currency = Dollar
-  def designation = "USD"
+  def make(x: Long) = new Dollar { val amount = x }
 }
