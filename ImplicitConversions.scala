@@ -8,7 +8,5 @@ implicit def function2ActionListener(f: ActionEvent => Unit) =
 
 val button = new JButton
 button.addActionListener(
-  function2ActionListener(
-    (_: ActionEvent) => println("pressed!")
-  )
+  (_: ActionEvent) => println("pressed!")
 )
