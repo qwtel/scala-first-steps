@@ -107,4 +107,15 @@ object ListMethods {
         else maxRest
       }
     }
+
+  def maxList[T <% Ordered[T]](elements: List[T]): T =
+    elements match {
+      case List() => throw new IllegalArgumentException("empty list")
+      case List(x) => x
+      case x :: rest => {
+        val maxRest = maxList(rest) // implicit
+        if (x > maxRest) x // implicit
+        else maxRest
+      }
+    }
 }
