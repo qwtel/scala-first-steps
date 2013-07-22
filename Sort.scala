@@ -102,8 +102,8 @@ object ListMethods {
       case List() => throw new IllegalArgumentException("empty list")
       case List(x) => x
       case x :: rest => {
-        val maxRest = maxListImpParm(rest)(orderer)
-        if (orderer(x) > maxRest) x
+        val maxRest = maxListImpParm(rest) // implicit
+        if (x > maxRest) x // implicit
         else maxRest
       }
     }
