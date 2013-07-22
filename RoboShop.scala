@@ -3,23 +3,20 @@ object RoboShop extends java.lang.Iterable[Android] {
   import scala.collection._
   private var set = mutable.Set[Android]()
 
-  def insert(robo: Android, s: Skin, sw: Software, a: ActorSensorKit) = {
-    robo.skin = s
-    robo.software = sw
-    robo.kit = a
-
-    if (set.contains(robo)) {
-      val old = set.find(_.id == robo.id).get
-      (old, robo) match {
-        case (old: Servant, robo: Servant) => replace(old, robo)
-        case (old: Worker, robo: Worker) => replace(old, robo)
-        case (old: Guard, robo: Guard) => replace(old, robo)
-        case _ => throw new AndroidActViolation("Can't replace " + old + "\nwith " + robo)
+  def insert(robo: Android) =
+    if(robo.skin != null && robo.software != null && robo.kit != null)
+      if (!set.contains(robo)) set += robo
+      else {
+        val old = set.find(_.id == robo.id).get
+        (old, robo) match {
+          case (old: Servant, robo: Servant) => replace(old, robo)
+          case (old: Worker, robo: Worker) => replace(old, robo)
+          case (old: Guard, robo: Guard) => replace(old, robo)
+          case _ => throw new Exception("Can't replace " + old.getClass + " with " + robo.getClass)
+        }
       }
-    } else {
-      set += robo
-    }
-  }
+    else
+      throw new Exception("Android Act")
 
   private def replace(old: Android, a: Android) = {
     set -= old
@@ -40,73 +37,48 @@ object RoboShop extends java.lang.Iterable[Android] {
     }
 
   def main(args: Array[String]) = {
-    var robo = new Entertainer
-    robo.id = 1
+    val id= 1
     insert(
-      robo,
-      SkinTouchSensitive(robo.id),
-      SoftwareEntertainer(robo.id, Certificate(1)),
-      ActorSensorKit(robo.id, 0.75)
+      new Entertainer(
+        id,
+        SkinTouchSensitive(id),
+        SoftwareEntertainer(id, Certificate(1)),
+        ActorSensorKit(id, 0.75)
+      )
     )
 
-    var robo2 = new Combatant
-    robo2.id = 1
     insert(
-      robo2,
-      SkinArmored(robo2.id),
-      SoftwareCombatant(robo2.id, Certificate(5)),
-      ActorSensorKit(robo2.id, 0.75)
+      new Combatant(
+        id,
+        SkinArmored(id),
+        SoftwareCombatant(id, Certificate(5)),
+        ActorSensorKit(id, 75)
+      )
     )
 
     println(find(1))
   }
 }
 
-class AndroidActViolation(message: String = null) extends RuntimeException(message)
-
 object Android {
-  private var id = 1
-  private def generateId() = {
+  private var id = 0
+  def generateId() = {
     id += 1
-    id - 1
+    id
   }
 }
 
-abstract class Android {
-  var id = Android.generateId()
+abstract class Android(val id: Int, k: ActorSensorKit) {
 
-  private var _s: Skin = _
-  private var _sw: Software = _
-  private var _a: ActorSensorKit = _
+  final def valid(id: Int): Boolean = this.id == id
 
-  final def validateId(id: Int): Boolean = this.id == id
-
-  def skin = _s
-  def skin_=(s: Skin) =
-    if (validateId(s.id) && validateSkin(s)) _s = s
-    else throw new AndroidActViolation
-
-  protected def validateSkin(s: Skin): Boolean = true
-
-  def software = _sw
-  def software_=(sw: Software) =
-    if (validateId(sw.id) && validateSoftware(sw)) _sw = sw
-    else throw new AndroidActViolation
-
-  protected def validateSoftware(sw: Software): Boolean = true
-
-  def kit = _a
-  def kit_=(a: ActorSensorKit) =
-    if (validateId(a.id) && validateKit(a)) _a = a
-    else throw new AndroidActViolation
-
-  protected def validateKit(a: ActorSensorKit): Boolean =
-    if (software.certificate.level == 3)
-      a.capacity <= 5.0
-    else if (software.certificate.level == 4)
-      a.capacity <= 10.0
-    else
-      false
+  val skin: Skin
+  val software: Software
+  lazy val kit = (this.software.certificate, k) match {
+    case (Certificate(3), ActorSensorKit(id, capacity)) if (valid(id) && capacity <= 5.0) => k
+    case (Certificate(4), ActorSensorKit(id, capacity)) if (valid(id) && capacity <= 10.0) => k
+    case _ => null
+  }
 
   override def hashCode = id
 
@@ -124,112 +96,102 @@ abstract class Android {
     "ActorSensorKit: " + kit.toString
 }
 
-abstract class Servant extends Android {
-  override def skin_=(s: Skin) = s match {
-    case s: SkinTouchSensitive => super.skin_=(s)
-    case _ => throw new AndroidActViolation
+abstract class Servant(i: Int, s: Skin, k: ActorSensorKit) extends Android(i, null) {
+  lazy val skin = s match {
+    case SkinTouchSensitive(id) if valid(id) => s
+    case _ => null
   }
 
-  protected override def validateSoftware(sw: Software): Boolean =
-    sw.certificate.level <= 2
-
-  protected override def validateKit(a: ActorSensorKit): Boolean =
-    a.capacity <= 1.0
-}
-
-class Assistant extends Servant {
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareAssistant => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+  override lazy val kit = k match {
+    case ActorSensorKit(id, capacity) if (valid(id) && capacity <= 1.0) => k
+    case _ => null
   }
 }
 
-class Entertainer extends Servant {
-  protected override def validateSoftware(sw : Software): Boolean =
-    sw.certificate.level == 1
-
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareEntertainer => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+abstract class Worker(i: Int, s: Skin, k: ActorSensorKit) extends Android(i, k) {
+  lazy val skin = s match {
+    case SkinTouchSensitive(id) if valid(id) => s
+    case SkinSolid(id) if valid(id) => s
+    case _ => null
   }
 }
 
-abstract class Worker extends Android {
-  protected override def validateSoftware(sw: Software): Boolean =
-    sw.certificate.level >= 3 && sw.certificate.level <= 4
-
-  override def skin_=(s: Skin) = s match {
-    case _: SkinArmored => throw new AndroidActViolation
-    case s: Skin => super.skin_=(s)
-    case _ => throw new AndroidActViolation
+abstract class Guard(i: Int, s: Skin, k: ActorSensorKit) extends Android(i, k) {
+  lazy val skin = s match {
+    case _: Skin if valid(s.id) => s
+    case _ => null
   }
 }
 
-class ConstructionWorker extends Worker {
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareConstructionWorker => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+class Assistant(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Servant(i, s, k) {
+   lazy val software = sw match {
+    case SoftwareAssistant(id, Certificate(level)) if (valid(id) && level <= 2) => sw
+    case _ => null
   }
 }
 
-class ServiceEngineer extends Worker {
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareServiceEngineer => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+class Entertainer(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Servant(i, s, k) {
+  lazy val software = sw match {
+    case SoftwareEntertainer(id, Certificate(1)) if valid(id) => sw
+    case _ => null
   }
 }
 
-class TransportWorker extends Worker {
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareTransportWorker => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+class ConstructionWorker(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Worker(i, s, k) {
+  lazy val software = sw match {
+    case SoftwareConstructionWorker(id, Certificate(level)) if (valid(id) && level >= 3 && level <= 4) => sw
+    case _ => null
   }
 }
 
-abstract class Guard extends Android {
-  protected override def validateSoftware(sw : Software): Boolean =
-    sw.certificate.level == 4
-
-  override def skin_=(s: Skin) = s match {
-    case s: Skin => super.skin_=(s)
-    case _ => throw new AndroidActViolation
+class ServiceEngineer(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Worker(i, s, k) {
+  lazy val software = sw match {
+    case SoftwareServiceEngineer(id, Certificate(level)) if (valid(id) && level >= 3 && level <= 4) => sw
+    case _ => null
   }
 }
 
-class PropertyGuard extends Guard {
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwarePropertyGuard => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+class TransportWorker(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Worker(i, s, k) {
+  lazy val software = sw match {
+    case SoftwareTransportWorker(id, Certificate(level)) if (valid(id) && level >= 3 && level <= 4) => sw
+    case _ => null
   }
 }
 
-class BodyGuard extends Guard {
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareBodyGuard => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+class PropertyGuard(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Guard(i, s, k) {
+  lazy val software = sw match {
+    case SoftwarePropertyGuard(id, Certificate(4)) if valid(id) => sw
+    case _ => null
   }
 }
 
-class Combatant extends Guard {
-  protected override def validateSoftware(sw: Software): Boolean =
-    sw.certificate.level == 5
-
-  override def software_=(sw: Software) = sw match {
-    case sw: SoftwareCombatant => super.software_=(sw)
-    case _ => throw new AndroidActViolation
+class BodyGuard(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Guard(i, s, k) {
+  lazy val software = sw match {
+    case SoftwareBodyGuard(id, Certificate(4)) if valid(id) => sw
+    case _ => null
   }
-
-  protected override def validateKit(a: ActorSensorKit): Boolean = true
 }
 
-abstract class Skin {
+class Combatant(i: Int, s: Skin, sw: Software, k: ActorSensorKit) extends Guard(i, s, null) {
+  lazy val software = sw match {
+    case SoftwareCombatant(id, Certificate(5)) if valid(id) => sw
+    case _ => null
+  }
+
+  override lazy val kit = k match {
+    case ActorSensorKit(id, _) if valid(id) => k
+    case _ => null
+  }
+}
+
+sealed abstract class Skin {
   val id: Int
 }
 case class SkinTouchSensitive(id: Int) extends Skin
 case class SkinSolid(id: Int) extends Skin
 case class SkinArmored(id: Int) extends Skin
 
-abstract class Software {
+sealed abstract class Software {
   val id: Int
   val certificate: Certificate
 }
