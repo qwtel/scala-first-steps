@@ -4,7 +4,7 @@ object RoboShop extends java.lang.Iterable[Android] {
   private var set = mutable.Set[Android]()
 
   def insert(robo: Android) =
-    if(robo.skin != null && robo.software != null && robo.kit != null)
+    if (robo.skin != null && robo.software != null && robo.kit != null)
       if (!set.contains(robo)) set += robo
       else {
         val old = set.find(_.id == robo.id).get
