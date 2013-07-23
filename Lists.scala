@@ -11,9 +11,22 @@ package my {
       else if (n <= 0) this
       else tail.drop(n - 1)
 
-    def map[U](f: T => U): List[U] =
-      if (isEmpty) Nil
-      else f(head) :: tail.map(f)
+    def map[U](f: T => U): List[U] = {
+      def mapHelper(res: List[U]): List[U] =
+        this match {
+          case Nil => res
+          case x :: xs => mapHelper(f(x) :: res)
+        }
+      mapHelper(Nil).reverse
+    }
+
+    def reverse: List[T] = this.foldLeft(List[T]())((ys, y) => y :: ys)
+
+    private def foldLeft[B](zero: B)(f: (B, T) => B): B =
+      this match {
+        case Nil => zero
+        case x :: xs => xs.foldLeft(f(zero, x))(f)
+      }
 
     def ::[U >: T](x: U): List[U] = new ::(x, this)
 
@@ -33,5 +46,9 @@ package my {
   // which is the same as ::(x, xs)
   final case class ::[T](head: T, tail: List[T] = Nil) extends List[T] {
     def isEmpty: Boolean = false
+  }
+
+  object List {
+    def apply[T](): List[T] = Nil
   }
 }
