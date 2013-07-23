@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 object Sort {
   def isort(xs: List[Int]): List[Int] =
     xs match {
@@ -108,14 +110,21 @@ object ListMethods {
       }
     }
 
-  def maxList[T <% Ordered[T]](elements: List[T]): T =
+  def maxList[T <% Ordered[T]](elements: List[T]): T = {
+    def maxListTailrec[T <% Ordered[T]](elements: List[T], max: T): T = {
+      elements match {
+        case Nil => max
+        case x :: rest => {
+          val xOrMax = if (x > max) x else max
+          maxListTailrec(rest, xOrMax)
+        }
+      }
+    }
+
     elements match {
       case List() => throw new IllegalArgumentException("empty list")
       case List(x) => x
-      case x :: rest => {
-        val maxRest = maxList(rest) // implicit
-        if (x > maxRest) x // implicit
-        else maxRest
-      }
+      case x :: rest => maxListTailrec(rest, x)
     }
+  }
 }
