@@ -15,13 +15,11 @@ package my {
       if (isEmpty) Nil
       else f(head) :: tail.map(f)
 
-    // these to methods are necessary to make the x :: xs syntax possible
-    // Anything here is implicitly converted to a list
-    // then it has a ::-method that returns a new list construct
-    // methods that end with : are applied in reverse order, e.g. x :: xs == xs.::(x)
-    // the type parameter [S >: T] is to support covariant lists, e.g. List[Cat] <: List[Animal]
-    implicit def asList[T](a: T): List[T] = new ::(a, Nil)
-    def ::[S >: T](x: S): List[S] = new ::(x, this)
+    def ::[U >: T](x: U): List[U] = new ::(x, this)
+
+    def :::[U >: T](prefix: List[U]): List[U] =
+      if (prefix.isEmpty) this
+      else prefix.head :: prefix.tail ::: this
   }
 
   case object Nil extends List[Nothing] {
@@ -37,15 +35,3 @@ package my {
     def isEmpty: Boolean = false
   }
 }
-
-/*
-::(1)
-::(1, Nil)
-::(1, 2)
-::(1, asList(2))
-::(1, ::(2))
-3.::(asList(1), 2)
-2.::(asList(1))
-
-1 :: 2 // a lot of weirdness going on to make this possible
-*/
