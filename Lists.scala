@@ -13,8 +13,6 @@ case object Nil extends MyList[Nothing] {
 // pronounced "cons" for "construct"
 // enables pattern matching like x :: xs
 // which is the same as ::(x, xs)
-final case class ::[T](hd: T, tl: MyList[T]) extends MyList[T] {
+final case class ::[T](head: T, tail: MyList[T]) extends MyList[T] {
   def isEmpty: Boolean = false
-  def head: T = hd
-  def tail: MyList[T] = tl
 }
