@@ -45,9 +45,8 @@ package simulation {
       private var sigVal = false
       private var actions: List[Action] = List()
 
-      def getSignal = sigVal
-
-      def setSignal(s: Boolean) =
+      def signal = sigVal
+      def signal_=(s: Boolean) =
         if (s != sigVal) {
           sigVal = s
           actions foreach (action => action())
@@ -61,9 +60,9 @@ package simulation {
 
     def inverter(input: Wire, output: Wire) = {
       def invertAction() {
-        val inputSig = input.getSignal
+        val inputSig = input.signal
         afterDelay(InverterDelay) {
-          output setSignal !inputSig
+          output.signal = !inputSig
         }
       }
       input addAction invertAction
@@ -71,10 +70,10 @@ package simulation {
 
     def andGate(a1: Wire, a2: Wire, output: Wire) = {
       def andAction() = {
-        val a1Sig = a1.getSignal
-        val a2Sig = a2.getSignal
+        val a1Sig = a1.signal
+        val a2Sig = a2.signal
         afterDelay(AndGateDelay) {
-          output setSignal (a1Sig & a2Sig)
+          output.signal = (a1Sig & a2Sig)
         }
       }
       a1 addAction andAction
@@ -83,10 +82,10 @@ package simulation {
 
     def orGate(o1: Wire, o2: Wire, output: Wire) = {
       def orAction() = {
-        val o1Sig = o1.getSignal
-        val o2Sig = o2.getSignal
+        val o1Sig = o1.signal
+        val o2Sig = o2.signal
         afterDelay(AndGateDelay) {
-          output setSignal (o1Sig | o2Sig)
+          output.signal = (o1Sig | o2Sig)
         }
       }
       o1 addAction orAction
@@ -95,27 +94,48 @@ package simulation {
 
     def probe(name: String, wire: Wire) {
       def probeAction() {
-        println(name + " " + currentTime + " nav-value = " + wire.getSignal)
+        println(name + " " + currentTime + " new-value = " + wire.signal)
       }
       wire addAction probeAction
     }
   }
-}
 
-/*
-// produces s = (a + b) % 2 and a carry c = (a + b) / 2
-def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
-  val d, e = new Wire
-  orGate(a, b, d)
-  andGate(a, b, c)
-  inverter(c, e)
-  andGate(d, e, s)
-}
+  abstract class CircuitSimulation extends BasicCircuitSimulation {
+    // produces s = (a + b) % 2 and a carry c = (a + b) / 2
+    def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
+      val d, e = new Wire
+      orGate(a, b, d)
+      andGate(a, b, c)
+      inverter(c, e)
+      andGate(d, e, s)
+    }
 
-def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) {
-  val s, c1, c2 = new Wire
-  halfAdder(a, cin, s, c1)
-  halfAdder(b, s, sum, c2)
-  orGate(c1, c2, cout)
+    def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) {
+      val s, c1, c2 = new Wire
+      halfAdder(a, cin, s, c1)
+      halfAdder(b, s, sum, c2)
+      orGate(c1, c2, cout)
+    }
+  }
+
+  object MySimulation extends CircuitSimulation {
+    val InverterDelay: Int = 1
+    val AndGateDelay: Int = 3
+    val OrGateDelay: Int = 5
+  }
+
+  object RunSimulation extends App {
+    import MySimulation._
+
+    val input1, input2, sum, carry = new Wire
+    probe("sum", sum)
+    probe("carry", carry)
+    halfAdder(input1, input2, sum, carry)
+
+    input1.signal = true
+    run()
+
+    input2.signal = true
+    run()
+  }
 }
-*/
