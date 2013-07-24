@@ -1,4 +1,4 @@
-import java.net.UnknownHostException
+import java.net.{InetAddress, UnknownHostException}
 import scala.actors._
 
 object SillyActor extends Actor {
@@ -29,14 +29,15 @@ object EchoActor extends Actor {
   }
 }
 
-object NameResolver extends Actor {
-  import java.net.{InetAddress, UnknownHostException}
+case class LookupIP(hostname: String, requester: Actor)
+case class LookupResult(name: String, address: Option[InetAddress])
 
+object NameResolver extends Actor {
   def act() {
     loop {
       react {
-        case (name: String, actor: Actor) =>
-          actor ! (name, getIp(name)) // redundant information to make "remembering" easier
+        case LookupIP(name, actor) =>
+          actor ! LookupResult(name, getIp(name))
         case msg =>
           println("Unhandled message: "+ msg)
       }
