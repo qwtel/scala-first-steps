@@ -36,7 +36,7 @@ object NameResolver extends Actor {
     loop {
       react {
         case (name: String, actor: Actor) =>
-          actor ! getIp(name)
+          actor ! (name, getIp(name)) // redundant information to make "remembering" easier
         case msg =>
           println("Unhandled message: "+ msg)
       }
